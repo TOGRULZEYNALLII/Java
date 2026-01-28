@@ -44,6 +44,27 @@ public class main {
                         running = false;
                         System.out.println("Exiting AutoHub. Goodbye!");
                         break;
+                    case 7:
+//                        show reviews for a car
+                        System.out.println("\nYorumlarını görmek istediğiniz arabanın Markasını yazın:");
+                        String brand = scanner.nextLine();
+
+                        Optional<Car> car = carService.findAll().stream()
+                                .filter(c -> c.getBrand().equalsIgnoreCase(brand))
+                                .findFirst();
+
+                        if (car.isPresent()) {
+                            List<Review> reviews = carService.getReviewsForCar(car.get().getId());
+                            if (reviews.isEmpty()) {
+                                System.out.println("Bu araba için yorum bulunamadı.");
+                            } else {
+                                System.out.println("\n--- Yorumlar ---");
+                                reviews.forEach(review -> System.out.println(review.format()));
+                            }
+                        } else {
+                            System.out.println("Araba bulunamadı.");
+                        }
+                        break;
                     default:
                         System.out.println("Invalid choice.");
                 }
@@ -178,6 +199,7 @@ private static void seedData(CarService carService) {
         System.out.println("4. Show top 3 cars by rating");
         System.out.println("5. Show average rating per model");
         System.out.println("6. Exit");
+        System.out.println("7. Show reviews for a car");
         System.out.print("Enter your choice: ");
     }
 
