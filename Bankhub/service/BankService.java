@@ -3,6 +3,7 @@ import DomainClass.*;
 import interfaces.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 public class BankService {
      private final Repository<Account> accountRepository;
@@ -23,20 +24,21 @@ public class BankService {
         public  List<Transaction> getAllTransactions() {
             return transactionRepository.findAll();
         }
-        public  deposit(Account account, double amount) {
+        public void  deposit(UUID id, double amount) {
+            Account account = accountRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Account not found"));
             double newBalance = account.getBalance() + amount;
-            Account updatedAccount = new Account(account.getId(), account.getOwnerName(), account.getAccountType(), newBalance);
-            accountRepository.save(updatedAccount);
+            account.setBalance(newBalance);
             Transaction transaction = new Transaction(java.util.UUID.randomUUID(), account.getId(), enums.TransactionType.DEPOSIT, amount, java.time.LocalDate.now().toString());
             transactionRepository.save(transaction);
         }
-        public withdraw(Account account, double amount) {
+        public void withdraw(UUID id, double amount) {
+            Account account = accountRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Account not found"));
             if (account.getBalance() < amount) {
-                throw new IllegalArgumentException("Insufficient funds");
+                throw new IllegalArgumentException("Insufficient balance");
+            }else{
+                double newBalance = account.getBalance() - amount;
+                account.setBalance(newBalance);
             }
-            double newBalance = account.getBalance() - amount;
-            Account updatedAccount = new Account(account.getId(), account.getOwnerName(), account.getAccountType(), newBalance);
-            accountRepository.save(updatedAccount);
             Transaction transaction = new Transaction(java.util.UUID.randomUUID(), account.getId(), enums.TransactionType.WITHDRAW, amount, java.time.LocalDate.now().toString());
             transactionRepository.save(transaction);
         }

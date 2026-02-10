@@ -8,7 +8,7 @@ public class Account implements Identifiable, Formatter {
     private final UUID id;
     private final String ownerName;
     private final String accountType;
-    private final double balance;
+    private  double balance;
 
     public Account(UUID id, String ownerName, String accountType, double balance) {
         this.id = id;
@@ -27,6 +27,9 @@ public class Account implements Identifiable, Formatter {
         return accountType;}
     public double getBalance() {
         return balance;}
+    public void setBalance(double newBalance) {
+        this.balance=newBalance;
+    }
     @Override
     public String format() {
         return "Account ID: " + id.toString() +
