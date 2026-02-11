@@ -1,7 +1,8 @@
 package service;
 import DomainClass.*;
+import Exceptions.AccountNotFound;
 import interfaces.Repository;
-
+import Exceptions.NegativeAmount;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,8 +25,16 @@ public class BankService {
         public  List<Transaction> getAllTransactions() {
             return transactionRepository.findAll();
         }
+
+        public void  findAccountById(UUID id) {
+             accountRepository.findById(id).orElseThrow(() -> new AccountNotFound("Account not found"));
+        }
+
         public void  deposit(UUID id, double amount) {
             Account account = accountRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Account not found"));
+            if (amount<=0) {
+                throw new NegativeAmount("Deposit amount must be positive");
+            }
             double newBalance = account.getBalance() + amount;
             account.setBalance(newBalance);
             Transaction transaction = new Transaction(java.util.UUID.randomUUID(), account.getId(), enums.TransactionType.DEPOSIT, amount, java.time.LocalDate.now().toString());
@@ -33,8 +42,11 @@ public class BankService {
         }
         public void withdraw(UUID id, double amount) {
             Account account = accountRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Account not found"));
+            if (amount<=0) {
+                throw new NegativeAmount("Withdrawal amount must be positive");
+            }
             if (account.getBalance() < amount) {
-                throw new IllegalArgumentException("Insufficient balance");
+                throw new NegativeAmount("Insufficient balance");
             }else{
                 double newBalance = account.getBalance() - amount;
                 account.setBalance(newBalance);
